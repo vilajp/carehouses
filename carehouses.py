@@ -75,12 +75,22 @@ while True:
 		print("Entrando en:", urlcadacasa)
 		
 
-		tags=sopa("span", urlcadacasa)
+		tags=sopa("div", urlcadacasa)
+
+		textRegext = re.compile(r'''
+		(<li|<h2[a-zA-Z0-9="-]+|<li>[a-zA-Z="<]+"h4")			#proceso li, h2 o h4
+		(>[a-zA-Z0-9"'-() ]+<)									#entre los signos mayores
+		''', re.VERBOSE | re.DOTALL)
 		
-		nombre = re.findall(".+(>[a-zA-Z]+<)" , str(tags))
-		try:
-			print(nombre[1])
-		except:
-			continue
+		nombre = textRegext.findall(str(tags))
+		for cada_nombre in nombre:
+			try:
+				print(cada_nombre[1])
+			except IndexError:
+
+				print("No encuentro indice 1")
+
+				continue
+
 	pagina += 1
 	conn.commit()
