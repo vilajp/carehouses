@@ -49,17 +49,20 @@ cur.executescript('''
 		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 		name TEXT UNIQUE)''')
 
+file = open("codigo_fuente.html", "a")
+wd = webdriver.Chrome("/WebDriver/bin/chromedriver.exe")
+	
+
 def sopa(tag, url):
-	wd = webdriver.Chrome("/WebDriver/bin/chromedriver.exe")
 	
 	wd.get(url)
 	html_page = wd.page_source
-	wd.quit()
+	# wd.quit()
 	
-	soup = BeautifulSoup(html_page, "html.parser")
+	# soup = BeautifulSoup(html_page, "html.parser")
 
-	tags=soup(tag)
-	return tags
+	# tags=soup(tag)
+	return html_page
 	
 pagina = 1
 
@@ -69,20 +72,26 @@ while True:
 	
 	tags=sopa("a", url)
 	
+	
 	urltodascasas = re.findall("(https://www.carehome.co.uk/carehome.cfm/searchazref/[0-9A-Z]+)" , str(tags))
 	
 	for urlcadacasa in urltodascasas:
 		print("Entrando en:", urlcadacasa)
 		
 
-		tags=sopa("div", urlcadacasa)
+		tags=sopa("div", urlcadacasa+"/extra-care-housing/")
+		
+		file.write("******************************************************\n")
+		file.write(urlcadacasa+"\n")
+		file.write("******************************************************\n")
+		file.write(tags)
 
 		textRegext = re.compile(r'''
 		(<li|<h2[a-zA-Z0-9="-]+|<li>[a-zA-Z="<]+"h4")			#proceso li, h2 o h4
 		(>[a-zA-Z0-9"'-() ]+<)									#entre los signos mayores
 		''', re.VERBOSE | re.DOTALL)
 		
-		nombre = textRegext.findall(str(tags))
+		nombre = textRegext.findall(tags)
 		for cada_nombre in nombre:
 			try:
 				print(cada_nombre[1])
